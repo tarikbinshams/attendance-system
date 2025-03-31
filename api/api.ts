@@ -84,3 +84,30 @@ export async function getUsers(request: Request) {
   );
   return response;
 }
+
+export async function addUser(payload: {
+  name: string;
+  email: string;
+  password: string;
+  status: string;
+  request: Request;
+}) {
+  const { request, ...rest } = payload;
+  const response = await fetchApi(
+    {
+      url: "/users",
+      method: "post",
+      data: rest,
+    },
+    z.object({
+      user: z.object({
+        _id: z.string(),
+        name: z.string(),
+        email: z.string(),
+      }),
+      error: z.string().optional(),
+    }),
+    request
+  );
+  return response;
+}
