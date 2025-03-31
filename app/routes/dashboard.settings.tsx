@@ -110,18 +110,12 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Settings() {
   const actionData = useActionData<typeof action>();
   const data = useLoaderData<typeof loader>();
-  console.log("Data:", data.data);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log("Action Data:", actionData); // Debugging line
-
-  // Check if there are any errors in actionData
   const errors = actionData?.errors || {};
   const hasErrors = Object.keys(errors).length > 0;
-  console.log("Errors:", errors); // Debugging line
+  console.log("Errors:", errors);
   if (hasErrors) {
-    // Handle errors (e.g., show a notification or alert)
     console.error("Form submission errors:", errors);
   }
 

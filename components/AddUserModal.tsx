@@ -23,8 +23,8 @@ export default function AddUserModal({ isOpen, onClose }: AddUserModalProps) {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <dialog ref={modalRef} className="modal h-full overflow-y-auto">
-      <div className="modal-box ">
+    <dialog ref={modalRef} className="modal w-[400px]">
+      <div className="modal-box w-[400px]">
         <form method="dialog">
           <button
             type="button"
