@@ -118,6 +118,15 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
+	// check email exists
+	var existingUser models.User
+	err := usersCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&existingUser)
+	if err == nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Email already exists"})
+	} else if err != nil && err.Error() != "mongo: no documents in result" {
+		return c.Status(500).JSON(fiber.Map{"error": "Error checking email: " + err.Error()})
+	}
+
 	user.ID = primitive.NewObjectID()
 	user.Status = "active"
 
