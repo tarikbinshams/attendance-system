@@ -4,10 +4,24 @@ import { useEffect, useRef } from "react";
 interface AddUserModalProps {
   isOpen: boolean;
   onClose: () => void;
+  errors?: {
+    name?: string;
+    email?: string;
+    password?: string;
+  };
+  actionData?: {
+    error: { error?: string } | null;
+  };
 }
 
-export default function AddUserModal({ isOpen, onClose }: AddUserModalProps) {
+export default function AddUserModal({
+  isOpen,
+  onClose,
+  errors,
+  actionData,
+}: AddUserModalProps) {
   const modalRef = useRef<HTMLDialogElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -18,25 +32,54 @@ export default function AddUserModal({ isOpen, onClose }: AddUserModalProps) {
   }, [isOpen]);
 
   const navigation = useNavigation();
-
-  // **Determine if the form is submitting**
   const isSubmitting = navigation.state === "submitting";
 
+  const handleClose = () => {
+    formRef.current?.reset(); // Reset the form fields
+    onClose();
+    modalRef.current?.close();
+    if (actionData?.error) {
+      actionData.error = null;
+    }
+  };
+
+  console.log("Modal actionData:", actionData?.error?.error);
+
   return (
-    <dialog ref={modalRef} className="modal w-[400px]">
+    <dialog
+      ref={modalRef}
+      className="modal"
+      style={{
+        width: "400px",
+        minHeight: "400px",
+        padding: "24px",
+        borderRadius: "8px",
+      }}
+    >
       <div className="modal-box w-[400px]">
-        <form method="dialog">
-          <button
-            type="button"
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </form>
-        <p className="font-bold text-lg mb-5">Add New User</p>
+        <div className="flex justify-between">
+          <p className="font-bold text-lg mb-5">Add New User</p>
+          <form method="dialog">
+            <button
+              type="button"
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              onClick={handleClose}
+            >
+              ✕
+            </button>
+          </form>
+        </div>
         <div className="p-2"></div> {/* Proper spacing */}
-        <Form method="post">
+        {actionData && actionData?.error && (
+          <div
+            role="alert"
+            className="alert alert-error alert-soft"
+            style={{ marginBottom: "16px" }}
+          >
+            <span>{actionData?.error?.error || "Something went wrong!"}</span>
+          </div>
+        )}
+        <Form ref={formRef} method="post">
           <div className="flex flex-col gap-4">
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Name</legend>
@@ -48,6 +91,9 @@ export default function AddUserModal({ isOpen, onClose }: AddUserModalProps) {
                 placeholder="Type here"
               />
             </fieldset>
+            {errors?.name && (
+              <p className="mt-0 text-sm text-red-600">{errors.name}</p>
+            )}
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Email</legend>
               <input
@@ -58,6 +104,9 @@ export default function AddUserModal({ isOpen, onClose }: AddUserModalProps) {
                 placeholder="Type here"
               />
             </fieldset>
+            {errors?.email && (
+              <p className="mt-0 text-sm text-red-600">{errors.email}</p>
+            )}
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Password</legend>
               <input
@@ -68,8 +117,17 @@ export default function AddUserModal({ isOpen, onClose }: AddUserModalProps) {
                 placeholder="Type here"
               />
             </fieldset>
+            {errors?.password && (
+              <p className="mt-0 text-sm text-red-600">{errors.password}</p>
+            )}
             <div className="flex justify-center gap-4 pb-0 w-full">
-              <button className="btn btn-soft btn-error flex-1">Cancel</button>
+              <button
+                type="button"
+                className="btn btn-soft btn-error flex-1"
+                onClick={handleClose}
+              >
+                Cancel
+              </button>
               <button
                 disabled={isSubmitting}
                 type="submit"
